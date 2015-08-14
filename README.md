@@ -1,10 +1,10 @@
 # browserify-istanbul
 
-A [browserify](http://github.com/substack/node-browserify) transform for the [istanbul](https://github.com/gotwarlost/istanbul) code coverage tool.
+A [browserify](http://github.com/substack/node-browserify) transform for the [istanbul](https://github.com/gotwarlost/istanbul) code coverage tool, with source map support for coverage reporting.
 
 ## Installing
 
-    npm install browserify-istanbul
+    npm install jsdotcr/browserify-istanbul
     
 ## Usage
 
@@ -29,6 +29,53 @@ browserifyBundle.transform(istanbul({
   // to only ignore the paths you specify.
   defaultIgnore: true
 }));
+```
+
+Or in your `karma.conf.js` file:
+
+```javascript
+var istanbul = require('browserify-istanbul');
+
+module.exports = function(karma) {
+  karma.set({
+    frameworks: ['browserify', 'mocha'],
+    preprocessors: {
+      'test/**/*.js': ['browserify'],
+      'src/**/*.js': ['browserify', 'coverage']
+    },
+    browsers: ['PhantomJS'],
+    logLevel: 'LOG_DEBUG',
+    autoWatch: true,
+    colors: true,
+    browserify: {
+      debug: true,
+      transform: [
+        ['babelify', { sourceMaps: 'both' }],
+        istanbul
+      ],
+      bundleDelay: 1000
+    },
+    reporters: ['progress', 'coverage'],
+    coverageReporter: {
+      reporters: [
+        {
+          type: 'html',
+          dir: 'test/coverage-html/',
+          subdir: function(browser) {
+            return browser.toLowerCase().split(/[ /-]/)[0];
+          }
+        },
+        {
+          type: 'lcovonly',
+          dir: 'test/coverage-lcov/',
+          subdir: function(browser) {
+            return browser.toLowerCase().split(/[ /-]/)[0];
+          }
+        }
+      ]
+    }
+  });
+};
 ```
 
 ## License
